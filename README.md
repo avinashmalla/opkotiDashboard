@@ -1,4 +1,5 @@
 # opkotiDashboard
+## This is a work under progress. NOT A FINISHED PROJECT yet
 Analysing data extracted from a Finnish company OP's real estate website.
 
 ## Author
