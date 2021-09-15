@@ -2,4 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-.dummy-r.R
+dummy-r.R
+*.csv
+*.Rproj
