@@ -4,5 +4,5 @@
 .Ruserdata
 dummy-r.R
 op-koti.csv
-.Rproj
+*.Rproj
 _config.yml
