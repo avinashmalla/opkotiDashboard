@@ -13,11 +13,49 @@ suppressPackageStartupMessages({
     library(ggrepel)
 })
 
-df <- read_csv('forDash.csv')
+df <- read.csv(
+    'forDash.csv',
+    stringsAsFactors = F,
+    colClasses = c(
+        "character",
+        "character",
+        "integer",
+        "numeric",
+        "numeric",
+        "numeric",
+        "numeric",
+        "numeric",
+        "character",
+        "character",
+        "character",
+        "character",
+        "integer",
+        "integer",
+        "integer",
+        "integer",
+        "integer",
+        "integer",
+        "integer",
+        "integer",
+        "character"
+    )
+)
 
 r1 = min(unique(df$totalArea))
 r2 = max(unique(df$totalArea))
-big_cities <- list('Helsinki', 'Espoo', 'Tampere', 'Vantaa', 'Oulu', 'Turku', 'Jyväskylä', 'Kuopio', 'Lahti', 'Pori')
+big_cities <-
+    list(
+        'Helsinki',
+        'Espoo',
+        'Tampere',
+        'Vantaa',
+        'Oulu',
+        'Turku',
+        'Jyväskylä',
+        'Kuopio',
+        'Lahti',
+        'Pori'
+    )
 
 # Define UI for application
 ui <- dashboardPage(
@@ -29,7 +67,7 @@ ui <- dashboardPage(
             menuItem("Graphs",
                      tabName = "graphs-tab",
                      icon = icon("chart-line")),
-
+            
             menuItem("Tables",
                      tabName = "tables-tab",
                      icon = icon("table")),
@@ -48,7 +86,7 @@ ui <- dashboardPage(
                 uiOutput("radOutput"),
                 uiOutput("distOut"),
                 uiOutput('houseTypeOut'),
-
+                
                 checkboxGroupInput(
                     "numRooms",
                     "Number of Rooms:",
@@ -60,7 +98,8 @@ ui <- dashboardPage(
                 )
             )
         ) #sidebarMenu close
-    ),#sidebar close
+    ),
+    #sidebar close
     dashboardBody(tabItems(
         tabItem(tabName = "graphs-tab",
                 tabBox(
@@ -119,12 +158,12 @@ server <- function(input, output, session) {
             selectInput("cityInput", "Big 10 cities", choices = big_cities)
         }
     })
-
+    
     df0 <- eventReactive(input$cityInput, {
         df %>% filter(city %in% input$cityInput)
     })
-
-
+    
+    
     output$distOut <- renderUI({
         if (input$pcORcity == 'cityRadio') {
             selectInput(
@@ -147,7 +186,7 @@ server <- function(input, output, session) {
             )
         }
     })
-
+    
     df3 <- reactive({
         if (input$pcORcity == 'cityRadio') {
             df0() %>% filter(district %in% input$distInput)
@@ -159,7 +198,7 @@ server <- function(input, output, session) {
             df0() %>% filter(district %in% input$big10DistInput)
         }
     })
-
+    
     output$areaInputMin <- renderUI({
         r1 = min(unique(df3()$totalArea))
         r2 = max(unique(df3()$totalArea))
@@ -172,7 +211,7 @@ server <- function(input, output, session) {
             max = r2
         )
     })
-
+    
     output$areaInputMax <- renderUI({
         r1 = min(unique(df3()$totalArea))
         r2 = max(unique(df3()$totalArea))
@@ -185,7 +224,7 @@ server <- function(input, output, session) {
             max = r2
         )
     })
-
+    
     output$houseTypeOut <- renderUI({
         ch = c(unique(as.character(df3()$listingType)))
         checkboxGroupInput("houseType",
@@ -193,19 +232,19 @@ server <- function(input, output, session) {
                            choices = ch,
                            selected = ch)
     })
-
+    
     df5 <- reactive({
         df3() %>%
             filter(listingType %in% input$houseType)
     })
-
+    
     df6 <- reactive({
         df5() %>%
             mutate(n_r = ifelse(numberOfRooms <= 4, numberOfRooms, '5+')) %>%
             filter(n_r %in% input$numRooms) %>%
             select(-n_r)
     })
-
+    
     output$results <- renderDT(
         datatable(
             df6(),
@@ -218,11 +257,11 @@ server <- function(input, output, session) {
                 '#Rooms' = 'numberOfRooms'
             )
         ) %>%
-            formatCurrency(columns = c(4, 7, 8), currency = "\U20AC") %>%
+            formatCurrency(columns = c(4, 5, 8), currency = "\U20AC") %>%
             formatStyle(columns = c(4, 7), 'text-align' = 'right') %>%
             formatStyle(columns = c(3), 'text-align' = 'center')
     )
-
+    
     df_graph1 <- eventReactive(input$big10a, {
         if (input$big10a == T) {
             df %>%
@@ -232,13 +271,13 @@ server <- function(input, output, session) {
             df
         }
     })
-
+    
     output$pl_pricePMsq <- renderPlotly({
         p <- df_graph1() %>%
             group_by(city) %>%
             summarize(AvgPricePMsq = mean(pricePMsq, na.rm = T)) %>%
             ggplot(aes(
-                x = reorder(city,-AvgPricePMsq),
+                x = reorder(city, -AvgPricePMsq),
                 y = AvgPricePMsq,
                 fill = city
             )) +
@@ -247,11 +286,11 @@ server <- function(input, output, session) {
             theme(axis.text.x = element_text(angle = 90),
                   legend.position = 'none') +
             ggtitle("Average Price per sq meters v Cities")
-
+        
         p <- ggplotly(p)
         p
     })
-
+    
     output$pl_pie <- renderPlot({
         p <- df_graph1() %>%
             group_by(listingType) %>%
@@ -263,7 +302,7 @@ server <- function(input, output, session) {
                 #cumulative percentages (top of each rectangle)
                 ymin = c(0, head(ymax, n = -1)),
                 #bottom of each rectangle
-
+                
                 labelPosition = (ymax + ymin) / 2,
                 #position of the label
                 label = paste0(listingType, ":", round(fraction * 100, 1), "%") #label
@@ -291,12 +330,12 @@ server <- function(input, output, session) {
             theme_void() +
             ggtitle('Types of houses') +
             theme(legend.position = "none")
-
+        
         # p <-ggplotly(p)
         p
     })
-
-
+    
+    
     output$pl_boxplot <- renderPlotly({
         p <- df_graph1() %>%
             # p <- df %>% filter (city %in% big_cities) %>%
@@ -311,7 +350,7 @@ server <- function(input, output, session) {
             xlab('Type of Building') + ylab('Price') +
             ggtitle('Boxplot of prices for each type of building') +
             theme(legend.position = 'none')
-
+        
         p <- ggplotly(p)
         # overrides black outline of outliers
         p$x$data[[1]]$marker$line$color = "red"
@@ -319,11 +358,11 @@ server <- function(input, output, session) {
         p$x$data[[1]]$marker$outliercolor = "red"
         # overrides black not as extreme outlier color
         p$x$data[[1]]$marker$color = "red"
-
+        
         p
     })
-
-
+    
+    
     output$pl_barPricevRooms <- renderPlotly({
         p <- df_graph1() %>%
             mutate(NumRooms = factor(
@@ -336,11 +375,11 @@ server <- function(input, output, session) {
             scale_x_binned(limits = c(0, 500000)) +
             theme(legend.title = element_text(size = 8)) +
             ggtitle("Prices and Number of rooms")
-
+        
         p <- ggplotly(p)
         p
     })
-
+    
     output$pl_ageVprice <- renderPlot({
         p <- df_graph1() %>%
             filter(city %in% big_cities) %>%
@@ -365,10 +404,10 @@ server <- function(input, output, session) {
             ) +
             scale_y_continuous(labels = scales::comma) +
             ggtitle("Average Building Age and Price in Big 10 Cities")
-
+        
         p
     })
-
+    
     output$pl_ageVppmsq <- renderPlot({
         p <- df_graph1() %>%
             filter(city %in% big_cities) %>%
@@ -392,7 +431,7 @@ server <- function(input, output, session) {
                 segment.color = 'grey50'
             ) +
             ggtitle("Average Building Age and Price per sq. meters in Big 10 Cities")
-
+        
         p
     })
 }
