@@ -64,13 +64,12 @@ ui <- dashboardPage(
         sidebarMenu(
             useShinyjs(),
             id = "sidebarid",
-            menuItem("Graphs",
-                     tabName = "graphs-tab",
-                     icon = icon("chart-line")),
-            
             menuItem("Tables",
                      tabName = "tables-tab",
                      icon = icon("table")),
+            menuItem("Graphs",
+                     tabName = "graphs-tab",
+                     icon = icon("chart-line")),
             conditionalPanel(
                 'input.sidebarid == "tables-tab"',
                 radioButtons(
@@ -106,16 +105,16 @@ ui <- dashboardPage(
                     width = 12,
                     tabPanel(
                         "Data Visualization",
-                        fluidRow(column(12, align = "center",
+                        fluidRow(column(4, align = "center",
                                         fluidRow(
                                             switchInput(
                                                 inputId = "big10a",
-                                                label = "Select big 10 cities",
+                                                label = "Select 10 most populated cities",
                                                 inline = T,
                                                 labelWidth = '64px',
                                                 size = 'normal',
                                                 width = '100px',
-                                                value = F
+                                                value = T
                                             )
                                         ))),
                         fluidRow(column(6, plotlyOutput('pl_boxplot')),
@@ -348,8 +347,8 @@ server <- function(input, output, session) {
             ) +
             ylim(0, 1000000) +
             xlab('Type of Building') + ylab('Price') +
-            ggtitle('Boxplot of prices for each type of building') +
-            theme(legend.position = 'none')
+            theme(axis.text.x = element_text(angle = 90), legend.position = 'none') +
+            ggtitle('Boxplot of prices for each type of building')
         
         p <- ggplotly(p)
         # overrides black outline of outliers
@@ -373,7 +372,7 @@ server <- function(input, output, session) {
             geom_bar(aes(fill = NumRooms)) +
             # geom_freqpoly(binwidth = 500) +
             scale_x_binned(limits = c(0, 500000)) +
-            theme(legend.title = element_text(size = 8)) +
+            theme(legend.title = element_text(size = 8),axis.text.x = element_text(angle = 90), legend.position = 'none') +
             ggtitle("Prices and Number of rooms")
         
         p <- ggplotly(p)
