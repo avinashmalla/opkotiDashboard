@@ -13,33 +13,31 @@ suppressPackageStartupMessages({
     library(ggrepel)
 })
 
-df <- read.csv(
-    'forDash.csv',
-    stringsAsFactors = F,
-    colClasses = c(
-        "character",
-        "character",
-        "integer",
-        "numeric",
-        "numeric",
-        "numeric",
-        "numeric",
-        "numeric",
-        "character",
-        "character",
-        "character",
-        "character",
-        "integer",
-        "integer",
-        "integer",
-        "integer",
-        "integer",
-        "integer",
-        "integer",
-        "integer",
-        "character"
-    )
-)
+df <- read.csv('forDash.csv', stringsAsFactors = F,
+               colClasses = c(
+                 "character",
+                 "character",
+                 "character",
+                 "integer",
+                 "numeric",
+                 "numeric",
+                 "numeric",
+                 "numeric",
+                 "numeric",
+                 "character",
+                 "character",
+                 "character",
+                 "character",
+                 "integer",
+                 "integer",
+                 "integer",
+                 "integer",
+                 "integer",
+                 "integer",
+                 "integer",
+                 "integer",
+                 "character"
+               ))
 
 r1 = min(unique(df$totalArea))
 r2 = max(unique(df$totalArea))

@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 dummy-r.R
+regress.Rmd
 op-koti.csv
 *.Rproj
 _config.yml
